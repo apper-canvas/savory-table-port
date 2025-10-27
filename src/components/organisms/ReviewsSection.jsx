@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import { reviewService } from "@/services/api/reviewService";
 import ReviewCard from "@/components/molecules/ReviewCard";
+import ReviewForm from "@/components/molecules/ReviewForm";
 import StarRating from "@/components/molecules/StarRating";
 import Button from "@/components/atoms/Button";
 import Loading from "@/components/ui/Loading";
@@ -10,16 +12,17 @@ import Error from "@/components/ui/Error";
 import ApperIcon from "@/components/ApperIcon";
 
 const ReviewsSection = () => {
-  const [reviews, setReviews] = useState([]);
+const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     loadReviewsData();
   }, []);
 
-  const loadReviewsData = async () => {
+const loadReviewsData = async () => {
     try {
       setLoading(true);
       setError("");
@@ -37,10 +40,14 @@ const ReviewsSection = () => {
     }
   };
 
-  if (loading) return <Loading type="reviews" />;
+  const handleReviewSubmit = () => {
+    setShowReviewForm(false);
+    loadReviewsData();
+  };
+if (loading) return <Loading type="reviews" />;
   if (error) return <Error message={error} onRetry={loadReviewsData} />;
 
-  return (
+return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
@@ -92,12 +99,21 @@ const ReviewsSection = () => {
         </motion.div>
 
         <motion.div
-          className="text-center"
+          className="flex items-center justify-center gap-4"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           viewport={{ once: true }}
         >
+          <Button 
+            size="lg" 
+            variant="primary" 
+            className="px-8 py-4"
+            onClick={() => setShowReviewForm(true)}
+          >
+            <ApperIcon name="PenSquare" className="w-5 h-5 mr-2" />
+            Write a Review
+          </Button>
           <Link to="/reviews">
             <Button size="lg" variant="secondary" className="px-8 py-4">
               <ApperIcon name="MessageCircle" className="w-5 h-5 mr-2" />
@@ -105,7 +121,31 @@ const ReviewsSection = () => {
             </Button>
           </Link>
         </motion.div>
-      </div>
+
+        {/* Review Form Modal */}
+        {showReviewForm && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowReviewForm(false)}
+          >
+            <motion.div
+              className="max-w-2xl w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ReviewForm
+                onSuccess={handleReviewSubmit}
+                onCancel={() => setShowReviewForm(false)}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+</div>
     </section>
   );
 };

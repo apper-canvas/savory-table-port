@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { reviewService } from "@/services/api/reviewService";
 import ReviewCard from "@/components/molecules/ReviewCard";
+import ReviewForm from "@/components/molecules/ReviewForm";
 import StarRating from "@/components/molecules/StarRating";
 import Button from "@/components/atoms/Button";
 import Loading from "@/components/ui/Loading";
@@ -16,6 +17,7 @@ const Reviews = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     loadReviewsData();
@@ -25,7 +27,7 @@ const Reviews = () => {
     sortReviews();
   }, [sortBy]);
 
-  const loadReviewsData = async () => {
+const loadReviewsData = async () => {
     try {
       setLoading(true);
       setError("");
@@ -43,6 +45,11 @@ const Reviews = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReviewSubmit = () => {
+    setShowReviewForm(false);
+    loadReviewsData();
   };
 
   const sortReviews = async () => {
@@ -74,7 +81,7 @@ const Reviews = () => {
   if (loading) return <Loading type="reviews" />;
   if (error) return <Error message={error} onRetry={loadReviewsData} />;
 
-  return (
+return (
     <div className="pt-24 pb-20 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -87,10 +94,33 @@ const Reviews = () => {
           <h1 className="text-5xl md:text-6xl font-display font-bold text-secondary mb-6">
             Customer Reviews
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
             Hear what our guests have to say about their dining experience at Savory Table
           </p>
+          <Button
+            size="lg"
+            variant="primary"
+            onClick={() => setShowReviewForm(!showReviewForm)}
+          >
+            <ApperIcon name="PenSquare" className="w-5 h-5 mr-2" />
+            {showReviewForm ? "Cancel" : "Write a Review"}
+          </Button>
         </motion.div>
+
+        {/* Review Form */}
+        {showReviewForm && (
+          <motion.div
+            className="mb-12 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <ReviewForm
+              onSuccess={handleReviewSubmit}
+              onCancel={() => setShowReviewForm(false)}
+            />
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Rating Summary Sidebar */}
@@ -146,10 +176,10 @@ const Reviews = () => {
             </motion.div>
           </div>
 
-          {/* Reviews List */}
+{/* Reviews List */}
           <div className="lg:col-span-3">
             <motion.div
-              className="flex items-center justify-between mb-8"
+              className="mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -159,12 +189,12 @@ const Reviews = () => {
               </h2>
             </motion.div>
 
-            {reviews.length > 0 ? (
+{reviews.length > 0 ? (
               <motion.div
                 className="space-y-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                transition={{ duration: 0.6, delay: showReviewForm ? 0.8 : 0.4 }}
               >
                 {reviews.map((review, index) => (
                   <motion.div
