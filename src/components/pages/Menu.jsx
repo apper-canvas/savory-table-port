@@ -47,23 +47,24 @@ const Menu = () => {
 
     // Apply category filter
     if (activeCategory !== "all") {
-      filtered = filtered.filter(item => item.category === activeCategory);
+filtered = filtered.filter(item => item.category_c === activeCategory);
     }
 
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(item =>
-        item.name.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+        item.name_c.toLowerCase().includes(query) ||
+        item.description_c.toLowerCase().includes(query)
       );
     }
 
     // Apply dietary tags filter
     if (selectedDietaryTags.length > 0) {
-      filtered = filtered.filter(item =>
-        selectedDietaryTags.some(tag => item.dietaryTags.includes(tag))
-      );
+      filtered = filtered.filter(item => {
+        const itemTags = item.dietary_tags_c ? item.dietary_tags_c.split(',') : [];
+        return selectedDietaryTags.some(tag => itemTags.includes(tag));
+      });
     }
 
     setFilteredItems(filtered);

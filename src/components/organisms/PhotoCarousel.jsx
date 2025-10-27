@@ -138,7 +138,7 @@ function PhotoCarousel() {
           >
             {/* Image */}
             <img
-              src={photos[currentIndex].imageUrl}
+src={photos[currentIndex].imageUrl}
               alt={photos[currentIndex].title}
               className="w-full h-full object-cover"
             />
@@ -155,13 +155,13 @@ function PhotoCarousel() {
             >
               <div className="max-w-2xl">
                 <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider bg-primary rounded-full">
-                  {photos[currentIndex].category}
+{photos[currentIndex].category}
                 </span>
                 <h3 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-2">
-                  {photos[currentIndex].title}
+{photos[currentIndex].title}
                 </h3>
                 <p className="text-sm md:text-base text-gray-200">
-                  {photos[currentIndex].description}
+{photos[currentIndex].description}
                 </p>
               </div>
             </motion.div>

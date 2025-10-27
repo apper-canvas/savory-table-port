@@ -70,31 +70,31 @@ const Contact = () => {
   if (error) return <Error message={error} onRetry={loadRestaurantInfo} />;
   if (!restaurantInfo) return null;
 
-  const contactInfo = [
+const contactInfo = [
     {
       icon: "MapPin",
       title: "Address",
-      details: restaurantInfo.address,
+      details: restaurantInfo.address_c || restaurantInfo.address,
       action: "Get Directions"
     },
     {
       icon: "Phone",
       title: "Phone",
-      details: restaurantInfo.phone,
+      details: restaurantInfo.phone_c || restaurantInfo.phone,
       action: "Call Now"
     },
     {
       icon: "Mail",
       title: "Email",
-      details: restaurantInfo.email,
+      details: restaurantInfo.email_c || restaurantInfo.email,
       action: "Send Email"
     }
   ];
 
-  const hours = Object.entries(restaurantInfo.hours).map(([day, time]) => ({
+  const hours = restaurantInfo.hours ? Object.entries(restaurantInfo.hours).map(([day, time]) => ({
     day: day.charAt(0).toUpperCase() + day.slice(1),
     time
-  }));
+  })) : [];
 
   return (
     <div className="pt-24 pb-20 min-h-screen bg-gray-50">

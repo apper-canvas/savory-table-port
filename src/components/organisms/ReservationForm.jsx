@@ -8,7 +8,7 @@ import Select from "@/components/atoms/Select";
 import Card from "@/components/atoms/Card";
 import ApperIcon from "@/components/ApperIcon";
 const ReservationForm = () => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     date: "",
     time: "",
     partySize: "",

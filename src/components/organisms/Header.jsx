@@ -3,11 +3,15 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
+import { useAuth } from "@/layouts/Root";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
+  const { isAuthenticated } = useSelector(state => state.user);
 
   const navigation = [
     { name: "Home", path: "/" },
@@ -58,7 +62,7 @@ const Header = () => {
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
+{/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
@@ -81,6 +85,14 @@ const Header = () => {
                 )}
               </Link>
             ))}
+            {isAuthenticated && (
+              <button
+                onClick={logout}
+                className="px-4 py-2 font-medium text-gray-700 hover:text-primary transition-colors duration-200"
+              >
+                Logout
+              </button>
+            )}
           </nav>
 
           {/* CTA Button - Desktop */}
@@ -114,7 +126,7 @@ const Header = () => {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-4 py-6 space-y-4">
+<div className="px-4 py-6 space-y-4">
               {navigation.map((item) => (
                 <Link
                   key={item.path}
@@ -130,6 +142,18 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full px-4 py-2 font-medium text-gray-700 hover:text-primary hover:bg-gray-50 text-left transition-colors duration-200"
+                >
+                  Logout
+                </button>
+              )}
               
               <Link
                 to="/reservations"

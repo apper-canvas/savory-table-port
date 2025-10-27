@@ -1,41 +1,192 @@
-import menuItemsData from "@/services/mockData/menuItems.json";
-
-let menuItems = [...menuItemsData];
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { getApperClient } from "@/services/apperClient";
 
 export const menuService = {
   async getAll() {
-    await delay(300);
-    return [...menuItems];
+    try {
+      const apperClient = getApperClient();
+      const response = await apperClient.fetchRecords("menu_item_c", {
+        fields: [
+          { field: { Name: "name_c" } },
+          { field: { Name: "description_c" } },
+          { field: { Name: "category_c" } },
+          { field: { Name: "price_c" } },
+          { field: { Name: "image_c" } },
+          { field: { Name: "dietary_tags_c" } },
+          { field: { Name: "available_c" } }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+      return [];
+    }
   },
 
   async getByCategory(category) {
-    await delay(200);
-    return menuItems.filter(item => item.category === category);
+    try {
+      const apperClient = getApperClient();
+      const response = await apperClient.fetchRecords("menu_item_c", {
+        fields: [
+          { field: { Name: "name_c" } },
+          { field: { Name: "description_c" } },
+          { field: { Name: "category_c" } },
+          { field: { Name: "price_c" } },
+          { field: { Name: "image_c" } },
+          { field: { Name: "dietary_tags_c" } },
+          { field: { Name: "available_c" } }
+        ],
+        where: [
+          {
+            FieldName: "category_c",
+            Operator: "EqualTo",
+            Values: [category]
+          }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching menu items by category:", error);
+      return [];
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    return menuItems.find(item => item.Id === id) || null;
+    try {
+      const apperClient = getApperClient();
+      const response = await apperClient.getRecordById("menu_item_c", id, {
+        fields: [
+          { field: { Name: "name_c" } },
+          { field: { Name: "description_c" } },
+          { field: { Name: "category_c" } },
+          { field: { Name: "price_c" } },
+          { field: { Name: "image_c" } },
+          { field: { Name: "dietary_tags_c" } },
+          { field: { Name: "available_c" } }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data || null;
+    } catch (error) {
+      console.error(`Error fetching menu item ${id}:`, error);
+      return null;
+    }
   },
 
   async searchItems(query) {
-    await delay(250);
-    const lowercaseQuery = query.toLowerCase();
-    return menuItems.filter(item => 
-      item.name.toLowerCase().includes(lowercaseQuery) ||
-      item.description.toLowerCase().includes(lowercaseQuery) ||
-      item.category.toLowerCase().includes(lowercaseQuery)
-    );
+    try {
+      const apperClient = getApperClient();
+      const response = await apperClient.fetchRecords("menu_item_c", {
+        fields: [
+          { field: { Name: "name_c" } },
+          { field: { Name: "description_c" } },
+          { field: { Name: "category_c" } },
+          { field: { Name: "price_c" } },
+          { field: { Name: "image_c" } },
+          { field: { Name: "dietary_tags_c" } },
+          { field: { Name: "available_c" } }
+        ],
+        whereGroups: [
+          {
+            operator: "OR",
+            subGroups: [
+              {
+                conditions: [
+                  {
+                    fieldName: "name_c",
+                    operator: "Contains",
+                    values: [query]
+                  }
+                ],
+                operator: "OR"
+              },
+              {
+                conditions: [
+                  {
+                    fieldName: "description_c",
+                    operator: "Contains",
+                    values: [query]
+                  }
+                ],
+                operator: "OR"
+              },
+              {
+                conditions: [
+                  {
+                    fieldName: "category_c",
+                    operator: "Contains",
+                    values: [query]
+                  }
+                ],
+                operator: "OR"
+              }
+            ]
+          }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error searching menu items:", error);
+      return [];
+    }
   },
 
   async getByDietaryTags(tags) {
-    await delay(200);
-    if (!tags || tags.length === 0) return [...menuItems];
-    return menuItems.filter(item => 
-      tags.some(tag => item.dietaryTags.includes(tag))
-    );
+    if (!tags || tags.length === 0) return await this.getAll();
+
+    try {
+      const apperClient = getApperClient();
+      const response = await apperClient.fetchRecords("menu_item_c", {
+        fields: [
+          { field: { Name: "name_c" } },
+          { field: { Name: "description_c" } },
+          { field: { Name: "category_c" } },
+          { field: { Name: "price_c" } },
+          { field: { Name: "image_c" } },
+          { field: { Name: "dietary_tags_c" } },
+          { field: { Name: "available_c" } }
+        ],
+        where: [
+          {
+            FieldName: "dietary_tags_c",
+            Operator: "Contains",
+            Values: tags
+          }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching menu items by dietary tags:", error);
+      return [];
+    }
   },
 
   getCategories() {
