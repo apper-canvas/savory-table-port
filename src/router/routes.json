@@ -36,16 +36,17 @@
       "redirectOnDeny": "/login"
     }
   },
-  "/reviews": {
+"/reviews": {
     "allow": {
       "when": {
         "conditions": [
           {
-            "label": "Reviews page is public",
-            "rule": "public"
+            "label": "User must be authenticated to view reviews",
+            "rule": "authenticated"
           }
         ]
-      }
+      },
+      "redirectOnDeny": "/login"
     }
   },
   "/contact": {
