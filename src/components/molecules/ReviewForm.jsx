@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import Button from "@/components/atoms/Button";
@@ -7,6 +9,8 @@ import ApperIcon from "@/components/ApperIcon";
 import { reviewService } from "@/services/api/reviewService";
 
 const ReviewForm = ({ onSuccess, onCancel }) => {
+  const { isAuthenticated } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewerName, setReviewerName] = useState("");
@@ -29,8 +33,15 @@ const ReviewForm = ({ onSuccess, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.info("Please log in to submit a review");
+      navigate("/login?redirect=/reviews");
+      return;
+    }
     
     if (!validateForm()) {
       toast.error("Please fill in all required fields");
@@ -158,16 +169,6 @@ const ReviewForm = ({ onSuccess, onCancel }) => {
               </>
             )}
           </Button>
-          {onCancel && (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onCancel}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-          )}
         </div>
       </form>
     </motion.div>
