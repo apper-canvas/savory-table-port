@@ -116,6 +116,73 @@ export const reviewService = {
     }
   },
 
+  async update(id, reviewData) {
+    try {
+      const apperClient = getApperClient();
+      
+      const response = await apperClient.updateRecord("review_c", {
+        records: [
+          {
+            Id: id,
+            rating_c: reviewData.rating,
+            review_text_c: reviewData.reviewText,
+            reviewer_name_c: reviewData.reviewerName
+          }
+        ]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      if (response.results && response.results.length > 0) {
+        const updated = response.results[0];
+        if (updated.success) {
+          const data = updated.data;
+          return {
+            Id: data.Id,
+            rating: data.rating_c,
+            reviewText: data.review_text_c,
+            reviewerName: data.reviewer_name_c,
+            date: data.date_c,
+            verified: data.verified_c
+          };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Error updating review ${id}:`, error);
+      return null;
+    }
+  },
+
+  async delete(id) {
+    try {
+      const apperClient = getApperClient();
+      
+      const response = await apperClient.deleteRecord("review_c", {
+        RecordIds: [id]
+      });
+
+      if (!response.success) {
+        console.error(response.message);
+        return false;
+      }
+
+      if (response.results && response.results.length > 0) {
+        const deleted = response.results[0];
+        return deleted.success;
+      }
+
+      return false;
+    } catch (error) {
+      console.error(`Error deleting review ${id}:`, error);
+      return false;
+    }
+  },
+
   async getSortedByRating(ascending = false) {
     const reviews = await this.getAll();
     return reviews.sort((a, b) => 
@@ -130,7 +197,7 @@ export const reviewService = {
     return Math.round((sum / reviews.length) * 10) / 10;
   },
 
-  async getRatingDistribution() {
+async getRatingDistribution() {
     const reviews = await this.getAll();
     const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     reviews.forEach(review => {

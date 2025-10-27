@@ -11,14 +11,14 @@ import Empty from "@/components/ui/Empty";
 import ApperIcon from "@/components/ApperIcon";
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState([]);
+const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [ratingDistribution, setRatingDistribution] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [showReviewForm, setShowReviewForm] = useState(false);
-
+  const [editingReviewId, setEditingReviewId] = useState(null);
   useEffect(() => {
     loadReviewsData();
   }, []);
@@ -47,8 +47,17 @@ const loadReviewsData = async () => {
     }
   };
 
-  const handleReviewSubmit = () => {
+const handleReviewSubmit = () => {
     setShowReviewForm(false);
+    loadReviewsData();
+  };
+
+  const handleReviewUpdate = () => {
+    setEditingReviewId(null);
+    loadReviewsData();
+  };
+
+  const handleReviewDelete = () => {
     loadReviewsData();
   };
 
@@ -196,14 +205,21 @@ return (
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: showReviewForm ? 0.8 : 0.4 }}
               >
-                {reviews.map((review, index) => (
+{reviews.map((review, index) => (
                   <motion.div
                     key={review.Id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.1 * index }}
                   >
-                    <ReviewCard review={review} />
+                    <ReviewCard 
+                      review={review}
+                      isEditing={editingReviewId === review.Id}
+                      onEdit={() => setEditingReviewId(review.Id)}
+                      onCancelEdit={() => setEditingReviewId(null)}
+                      onUpdate={handleReviewUpdate}
+                      onDelete={handleReviewDelete}
+                    />
                   </motion.div>
                 ))}
               </motion.div>
