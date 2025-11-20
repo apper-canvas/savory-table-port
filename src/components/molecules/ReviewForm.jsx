@@ -12,13 +12,15 @@ const ReviewForm = ({ onSuccess, onCancel }) => {
   const { isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
+const [hoverRating, setHoverRating] = useState(0);
+  const [title, setTitle] = useState("");
   const [reviewerName, setReviewerName] = useState("");
   const [reviewText, setReviewText] = useState("");
+  const [pros, setPros] = useState("");
+  const [cons, setCons] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const validateForm = () => {
+const validateForm = () => {
     const newErrors = {};
     
     if (rating === 0) {
@@ -27,6 +29,10 @@ const ReviewForm = ({ onSuccess, onCancel }) => {
     
     if (!reviewerName.trim()) {
       newErrors.reviewerName = "Name is required";
+    }
+    
+    if (!title.trim()) {
+      newErrors.title = "Review title is required";
     }
     
     setErrors(newErrors);
@@ -51,17 +57,23 @@ const handleSubmit = async (e) => {
     try {
       setLoading(true);
       const result = await reviewService.create({
+title: title.trim(),
         rating,
         reviewText: reviewText.trim(),
-        reviewerName: reviewerName.trim()
+        reviewerName: reviewerName.trim(),
+        pros: pros.trim(),
+        cons: cons.trim()
       });
 
       if (result) {
         toast.success("Review submitted successfully!");
         // Reset form
         setRating(0);
+setTitle("");
         setReviewerName("");
         setReviewText("");
+        setPros("");
+        setCons("");
         setErrors({});
         // Call parent callback
         if (onSuccess) onSuccess();
@@ -129,7 +141,21 @@ const handleSubmit = async (e) => {
           disabled={loading}
           placeholder="Enter your name"
           maxLength={100}
-        />
+/>
+
+        {/* Title */}
+        <div>
+          <Input
+            label="Review Title"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={loading}
+            placeholder="Give your review a title..."
+            maxLength={200}
+            error={errors.title}
+          />
+        </div>
 
         {/* Review Text */}
         <div>
@@ -141,13 +167,45 @@ const handleSubmit = async (e) => {
             onChange={(e) => setReviewText(e.target.value)}
             disabled={loading}
             placeholder="Share your experience at Savory Table..."
-            rows={5}
+            rows={4}
             maxLength={1000}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none"
           />
           <p className="text-sm text-gray-500 mt-1 text-right">
             {reviewText.length}/1000 characters
           </p>
+        </div>
+
+        {/* Pros */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            What did you like? (Pros)
+          </label>
+          <textarea
+            value={pros}
+            onChange={(e) => setPros(e.target.value)}
+            disabled={loading}
+            placeholder="What were the highlights of your experience..."
+            rows={3}
+            maxLength={500}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none"
+          />
+        </div>
+
+        {/* Cons */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Areas for improvement (Cons)
+          </label>
+          <textarea
+            value={cons}
+            onChange={(e) => setCons(e.target.value)}
+            disabled={loading}
+            placeholder="What could be improved..."
+            rows={3}
+            maxLength={500}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none"
+          />
         </div>
 
         {/* Form Actions */}
